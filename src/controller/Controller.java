@@ -5,10 +5,10 @@ import java.util.concurrent.BlockingQueue;
 
 import javax.swing.JOptionPane;
 
-import src.model.Model;
-import src.model.Word;
-import src.view.View;
-import src.controller.WordEvent;
+import model.Model;
+import model.Word;
+import view.View;
+import controller.WordEvent;
 
 
 /**
