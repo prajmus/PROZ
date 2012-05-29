@@ -1,0 +1,2 @@
+javac Main.java ../controller/Controller.java ../model/Model.java ../view/View.java ../controller/WordEvent.java ../model/Word.java ../model/Database.java ../view/MainFrame.java ../view/LearnFrame.java ../view/EditFrame.java ../view/Frames.java
+java Main

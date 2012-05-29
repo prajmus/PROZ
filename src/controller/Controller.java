@@ -10,7 +10,6 @@ import model.Word;
 import view.View;
 import controller.WordEvent;
 
-
 /**
  * Controller class of the MVC design pattern
  * @author Jakub Borowski
@@ -18,16 +17,16 @@ import controller.WordEvent;
  */
 public class Controller
 {
-	private final Model model;	/** Model reference */
-	private final View view;		/** View reference */
-	private final BlockingQueue<WordEvent> eventQueue;	/** BlokingQueue reference */
-	Vector<String> groupsList = null;	/** List of groups to be send to View */
+	private final Model model;
+	private final View view;	
+	private final BlockingQueue<WordEvent> eventQueue;
+	Vector<String> groupsList = null;
 	
 	/**
 	 * Constructor assigns the reference to BlockingQueue, Model and View
 	 * @param eventQueue BlockingQueue reference
-	 * @param model	Model reference
-	 * @param view		View reference
+	 * @param model Model reference
+	 * @param view	View reference
 	 */
 	public Controller(final BlockingQueue<WordEvent> eventQueue, final Model model, final View view)
 	{
@@ -71,6 +70,9 @@ public class Controller
 					case WordEvent.REMOVE_ROWS:
 						removeRows();
 						break;
+					case WordEvent.DELETE_GROUP:
+						deleteGroup();
+						break;
 					default:
 						System.exit(0);
 			}
@@ -107,9 +109,15 @@ public class Controller
 	private void prepareLearnMode()
 	{
 		groupsList = model.getListOfGroups();
-		model.getListOfWords(view.displayChooseDialog(groupsList, "Which group do you want to study?"));
-		view.getLearnFrame().setWord();
-		view.prepareLearnMode();
+		String choice = view.displayChooseDialog(groupsList, "Which group do you want to study?");
+		if(choice == null)
+			view.prepareMainMode();
+		else
+		{
+			model.getListOfWords(choice);
+			view.getLearnFrame().setWord();
+			view.prepareLearnMode();
+		}
 	}
 	/**
 	 * Prepares editing mode: loads selected group or creates new, sets the View
@@ -119,18 +127,23 @@ public class Controller
 		groupsList = model.getListOfGroups();
 		groupsList.add("New...");
 		String choice = view.displayChooseDialog(groupsList, "Which group do you want to edit?");
-		if(choice.equals("New..."))
-		{
-			String name = (String)JOptionPane.showInputDialog(view.getMainFrame(), "Enter new set name: ", null, JOptionPane.PLAIN_MESSAGE, null, null, null);
-			model.setCurrentGroup(name);
-			view.getEditFrame().setGroup(new Vector<Word>(), true);
-		}
+		if(choice == null)
+			view.prepareMainMode();
 		else
 		{
-			Vector<Word> words = model.getListOfWords(choice);
-			view.getEditFrame().setGroup(words, false);
+			if(choice.equals("New..."))
+			{
+				String name = (String)JOptionPane.showInputDialog(view.getMainFrame(), "Enter new set name: ", null, JOptionPane.PLAIN_MESSAGE, null, null, null);
+				model.setCurrentGroup(name);
+				view.getEditFrame().setGroup(new Vector<Word>(), true);
+			}
+			else
+			{
+				Vector<Word> words = model.getListOfWords(choice);
+				view.getEditFrame().setGroup(words, false);
+			}
+			view.prepareEditMode();
 		}
-		view.prepareEditMode();
 	}
 	/**
 	 * Remove word from list of current words to be learned ex. when user stated that he knows it. Loads new word, or ends learning if non.
@@ -145,8 +158,12 @@ public class Controller
 		else
 		{
 			groupsList = model.getListOfGroups();
-			model.getListOfWords(view.displayChooseDialog(groupsList, "You got "+ model.getGoodWords() + " out of " + model.getGuessedWords() + 
-					" right. <br /> Which group do you want to study next?"));
+			String s = view.displayChooseDialog(groupsList, "You got "+ model.getGoodWords() + " out of " + model.getGuessedWords() + 
+					" right.\nWhich group do you want to study next?");
+			if(s==null)
+				model.getListOfWords(model.getCurrentGroup());
+			else
+				model.getListOfWords(s);
 			view.getLearnFrame().setWord();
 			view.prepareLearnMode();
 		}
@@ -192,5 +209,13 @@ public class Controller
 	private void removeRows()
 	{
 		view.getEditFrame().removeRows();
+	}
+	/**
+	 * Deletes currently edited group from database
+	 */
+	private void deleteGroup()
+	{
+		model.deleteGroup();
+		prepareEditMode();
 	}
 }

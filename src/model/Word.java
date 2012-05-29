@@ -1,16 +1,30 @@
 package model;
 
-public class Word {
+/**
+ * Class representing every single word to be learned: its original form, translation, and name of the group it belongs to.
+ * @author Jakub Borowski
+ *
+ */
+public class Word 
+{
 	private String toTranslate;
 	private String translation;
 	private String group;
-	
-	Word()
+	/**
+	 * Default class constructor
+	 */
+	public Word()
 	{
 		toTranslate = new String();
 		translation = new String();
 		group = new String();
 	}
+	/**
+	 * Class constructor
+	 * @param word	word's original form
+	 * @param translation word's translation
+	 * @param group	word's group (where it belongs)
+	 */
 	public Word(final String word, final String translation, final String group)
 	{
 		this.toTranslate = new String(word);
@@ -18,23 +32,52 @@ public class Word {
 		this.group = new String(group);
 	}
 	
-	
-	public final String getToTranslate() {
+	/**
+	 * Gets word original form
+	 * @return original form
+	 */
+	public final String getToTranslate() 
+	{
 		return toTranslate;
 	}
-	public void setWord(final String toTranslate) {
+	/**
+	 * sets word's original form
+	 * @param toTranslate new word's original form
+	 */
+	public void setToTranslate(final String toTranslate) 
+	{
 		this.toTranslate = toTranslate;
 	}
-	public final String getTranslation() {
+	/**
+	 * gets word's translation
+	 * @return translation
+	 */
+	public final String getTranslation() 
+	{
 		return translation;
 	}
-	public void setTranslation(final String translation) {
+	/**
+	 * sets word's translation
+	 * @param translation word's new translation
+	 */
+	public void setTranslation(final String translation) 
+	{
 		this.translation = translation;
 	}
-	public final String getGroup() {
+	/**
+	 * gets word's group
+	 * @return word's group
+	 */
+	public final String getGroup()
+	{
 		return group;
 	}
-	public void setGroup(final String group) {
+	/**
+	 * sets word's group
+	 * @param group name of the new group
+	 */
+	public void setGroup(final String group) 
+	{
 		this.group = group;
 	}
 }

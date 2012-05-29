@@ -5,8 +5,8 @@ package view;
  * @author Jakub Borowski
  *
  */
-
-public interface Frames{
+public interface Frames
+{
 	/**
 	 * Prepares and displays top menu
 	 */

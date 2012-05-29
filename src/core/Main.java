@@ -9,11 +9,12 @@ import controller.Controller;
 import controller.WordEvent;
 
 /**
- * Main class responsible for launching the whole application. Creates instances of Model, View and Controller
+ * Main class responsible for launching the whole application. Creates instances of Model, View and Controller. Controller is in new thread
  * @author Jakub Borowski
  */
 
-public class Main {
+public class Main
+{
 	/**
 	 * main function
 	 * @param args		runnable arguments

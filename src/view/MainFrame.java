@@ -17,20 +17,24 @@ import controller.WordEvent;
 import model.Model;
 
 /**
- * Displays welcome window, allowing to chose mode
+ * Class extending JFrame and implementing Frames. Displays welcome window, allowing to chose mode.
  * @author Jakub Borowski
  *
  */
 public class MainFrame extends JFrame implements Frames 
 {
 	private final BlockingQueue<WordEvent> eventQueue;
-	@SuppressWarnings("unused")
 	private final Model model;
 	
 	private JButton editModeButton;
 	private JButton learnModeButton;
 	private JLabel chooseModeLabel;
 	
+	/**
+	 * Class constructor.
+	 * @param eventQueue reference to BlockingQueue, to send actions to Controller
+	 * @param model reference to model
+	 */
 	public MainFrame(BlockingQueue<WordEvent> eventQueue, Model model)
 	{
 		this.eventQueue = eventQueue;
@@ -38,7 +42,9 @@ public class MainFrame extends JFrame implements Frames
 		prepareMenu();
 		prepareFrame();
 	}
-	
+	/**
+	 * prepares top menu to be displayed
+	 */
 	public void prepareMenu()
 	{
 		JMenuBar menuBar = new JMenuBar();
@@ -46,16 +52,18 @@ public class MainFrame extends JFrame implements Frames
 		JMenu fileMenu = new JMenu("File");
 		fileMenu.add("Close").addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
 				System.exit(0);
 			}
 		});
 		menuBar.add(fileMenu);
 		setJMenuBar(menuBar);
 	}
-	
+	/**
+	 * prepares the whole frame to be displayed
+	 */
 	public void prepareFrame()
 	{
+		setLocation(200, 100);
 		setTitle("Words learner");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(400,200);

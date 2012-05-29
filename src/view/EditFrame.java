@@ -24,15 +24,26 @@ import model.Word;
 
 import controller.WordEvent;
 
+
+/**
+ * Class extending JFrame and implementing Frames. It displays the window responsible for editing data.
+ * @author Jakub Borowski
+ *
+ */
 public class EditFrame extends JFrame implements Frames 
 {
 	private final BlockingQueue<WordEvent> eventQueue;
 	private final Model model;
 	private JPanel mainPanel;
-	private JButton saveButton, cancelButton, addRowButton, removeRowButton;
-	DefaultTableModel tableModel;
+	private JButton saveButton, cancelButton, addRowButton, removeRowButton, deleteButton;
+	private DefaultTableModel tableModel;
 	private JTable table;
 	
+	/**
+	 * Class constructor.
+	 * @param eventQueue	reference to BlockingQueue, to send actions to Controller
+	 * @param model reference to model
+	 */
 	public EditFrame(final BlockingQueue<WordEvent> eventQueue, final Model model)
 	{
 		this.eventQueue = eventQueue;
@@ -40,7 +51,9 @@ public class EditFrame extends JFrame implements Frames
 		prepareMenu();
 		prepareFrame();
 	}
-	
+	/**
+	 * prepares top menu to be displayed
+	 */
 	public void prepareMenu()
 	{
 		JMenuBar menuBar = new JMenuBar();
@@ -60,23 +73,24 @@ public class EditFrame extends JFrame implements Frames
 				try {
 					eventQueue.put(new WordEvent(WordEvent.PREPARE_EDIT));
 				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
 		});
 		fileMenu.add("Close").addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
 				System.exit(0);
 			}
 		});
 		menuBar.add(fileMenu);
 		setJMenuBar(menuBar);
 	}
-	
+	/**
+	 * prepares the whole frame to be displayed
+	 */
 	public void prepareFrame()
 	{
+		setLocation(200, 100);
 		setSize(400,400);
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new BorderLayout());
@@ -96,8 +110,16 @@ public class EditFrame extends JFrame implements Frames
 				eventQueue.add(new WordEvent(WordEvent.REMOVE_ROWS));
 			}
 		});
+		deleteButton = new JButton("del");
+		deleteButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				eventQueue.add(new WordEvent(WordEvent.DELETE_GROUP));
+			}
+		});
+		
 		northPanel.add(addRowButton);
 		northPanel.add(removeRowButton);
+		northPanel.add(deleteButton);
 		mainPanel.add(northPanel, BorderLayout.NORTH);
 		// NOTRH PANEL END
 		
@@ -132,18 +154,37 @@ public class EditFrame extends JFrame implements Frames
 		mainPanel.add(southPanel, BorderLayout.SOUTH);
 		// SOUTH PANEL END
 		
+		JPanel centerPanel = new JPanel();
+		centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+		JLabel groupName = new JLabel(model.getCurrentGroup());
+		centerPanel.add(groupName);
+		Object[] columns = {"Word", "Translation"};
+		tableModel = new DefaultTableModel(5, 2);
+		tableModel.setColumnIdentifiers(columns);
+		
+		table = new JTable(tableModel);
+		JScrollPane scrollPane = new JScrollPane(table);
+		table.setFillsViewportHeight(true);
+		tableModel.addTableModelListener(new TableModelListener() {
+			public void tableChanged(TableModelEvent arg0) {
+				getRootPane().setDefaultButton(saveButton);
+				saveButton.setEnabled(true);
+			}
+		});
+		centerPanel.add(scrollPane);
+		mainPanel.add(centerPanel, BorderLayout.CENTER);
+		
 		getRootPane().setDefaultButton(cancelButton);
 		mainPanel.setVisible(true);
 		add(mainPanel);
 	}
-	
+	/**
+	 * Fills JTable with selected group
+	 * @param words	data to be displayed in table
+	 * @param newSet	true if creating new set, false otherwise
+	 */
 	public void setGroup(final Vector<Word> words, boolean newSet)
 	{
-		JPanel centerPanel = new JPanel();
-		centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-		
-		JLabel groupName = new JLabel(model.getCurrentGroup());
-		centerPanel.add(groupName);
 		Object[] columns = {"Word", "Translation"};
 		if(newSet)
 		{
@@ -162,24 +203,27 @@ public class EditFrame extends JFrame implements Frames
 			}
 			tableModel = new DefaultTableModel(rows, columns);
 		}
-		table = new JTable(tableModel);
-		JScrollPane scrollPane = new JScrollPane(table);
-		table.setFillsViewportHeight(true);
+		//table = new JTable(tableModel);
+		table.setModel(tableModel);
 		tableModel.addTableModelListener(new TableModelListener() {
 			public void tableChanged(TableModelEvent arg0) {
 				getRootPane().setDefaultButton(saveButton);
 				saveButton.setEnabled(true);
 			}
 		});
-		centerPanel.add(scrollPane);
-		mainPanel.add(centerPanel, BorderLayout.CENTER);
 	}
-	
+	/**
+	 * Adds row to table.
+	 * @param word	toTranslate part of the word
+	 * @param translation	translation of the word
+	 */
 	public void addRow(String word, String translation)
 	{
 		tableModel.insertRow(table.getRowCount(), new Object[]{word, translation});
 	}
-	
+	/**
+	 * Removes all selected rows from table.
+	 */
 	public void removeRows()
 	{
 		int[] rows = table.getSelectedRows();

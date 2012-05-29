@@ -18,6 +18,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import model.Model;
 
@@ -25,7 +26,7 @@ import controller.WordEvent;
 
 
 /**
- * Class extending JFrame. It's made to display the main learning window of the application
+ * Class extending JFrame and implementing Frames. It's made to display the learning window of the application
  * @author Jakub Borowski
  *
  */
@@ -43,8 +44,11 @@ public class LearnFrame extends JFrame implements Frames
 	private JLabel toTranslateWordLabel;
 	private JLabel translationWordLabel;
 	private JLabel correctWordLabel;
+
 	/**
-	 * Constructor of the class, invoking prepareFrame method.
+	 * Class constructor.
+	 * @param eventQueue reference to BlockingQueue, to send actions to Controller
+	 * @param model reference to model
 	 */
 	public LearnFrame(BlockingQueue<WordEvent> eventQueue, Model model)
 	{
@@ -59,6 +63,7 @@ public class LearnFrame extends JFrame implements Frames
 	 */
 	public void prepareFrame()
 	{
+		setLocation(200, 100);
 		setTitle("Word Learner");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(370,130);
@@ -191,15 +196,19 @@ public class LearnFrame extends JFrame implements Frames
 	 */
 	public void switchButtons()
 	{
-		final boolean decision = checkButton.isVisible();
-		checkButton.setVisible(!decision);
-		knowButton.setVisible(decision);
-		repeatButton.setVisible(decision);
-		dontKnowButton.setVisible(decision);
-		if(decision)
-			getRootPane().setDefaultButton(knowButton);
-		else
-			getRootPane().setDefaultButton(checkButton);
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				final boolean decision = checkButton.isVisible();
+				checkButton.setVisible(!decision);
+				knowButton.setVisible(decision);
+				repeatButton.setVisible(decision);
+				dontKnowButton.setVisible(decision);
+				if(decision)
+					getRootPane().setDefaultButton(knowButton);
+				else
+					getRootPane().setDefaultButton(checkButton);
+			}
+		});
 	}
 	/**
 	 * @return	value of what is inserted into Translation Field
@@ -213,26 +222,35 @@ public class LearnFrame extends JFrame implements Frames
 	 * @param text correct answer
 	 * @param isCorrect	determine whether the answer was good of bad to choose color
 	 */
-	public void setCorrectWordLabel(final String text, boolean isCorrect)
+	public void setCorrectWordLabel(final String text, final boolean isCorrect)
 	{
-		correctWordLabel.setText(text);
-		if(isCorrect) 
-			correctWordLabel.setForeground(Color.green);
-		else
-			correctWordLabel.setForeground(Color.red);
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				correctWordLabel.setText(text);
+				if(isCorrect) 
+					correctWordLabel.setForeground(Color.green);
+				else
+					correctWordLabel.setForeground(Color.red);
+			}
+		});
+
 	}
 	/**
 	 * sets word in toTranslateWordField, taken from Model
 	 */
 	public void setWord()
 	{
-		toTranslateWordField.setText(model.getCurrentWord().getToTranslate());
-		translationWordField.setText("");
-		correctWordLabel.setText("");
-		checkButton.setVisible(true);
-		knowButton.setVisible(false);
-		repeatButton.setVisible(false);
-		dontKnowButton.setVisible(false);
-		getRootPane().setDefaultButton(checkButton);
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				toTranslateWordField.setText(model.getCurrentWord().getToTranslate());
+				translationWordField.setText("");
+				correctWordLabel.setText("");
+				checkButton.setVisible(true);
+				knowButton.setVisible(false);
+				repeatButton.setVisible(false);
+				dontKnowButton.setVisible(false);
+				getRootPane().setDefaultButton(checkButton);
+			}
+		});
 	}
 }
